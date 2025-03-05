@@ -8,8 +8,8 @@ import seaborn as sns
 sns.set_theme(style="whitegrid", context="talk")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-st.write("📂 **Working Directory:**", BASE_DIR)
-st.write("📄 **Files in Directory:**", os.listdir(BASE_DIR))
+data_path_items = os.path.join(BASE_DIR, "order_items_dataset.csv")
+data_path_payments = os.path.join(BASE_DIR, "order_payments_dataset.csv")
 
 # 🔹 Fungsi untuk membaca file CSV dengan fallback ke file_uploader
 def load_csv(file_name, label):
