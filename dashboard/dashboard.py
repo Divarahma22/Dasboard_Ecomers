@@ -7,25 +7,22 @@ import seaborn as sns
 # Atur gaya Seaborn
 sns.set_theme(style="whitegrid", context="talk")
 
-# 🔹 Fungsi untuk membaca file CSV dengan fallback ke file_uploader
-def load_csv(file_name, label):
-    if os.path.exists(file_name):  # Cek apakah file ada di direktori yang sama
-        return pd.read_csv(file_name)
+# Path ke direktori proyek
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+order_items_path = os.path.join(BASE_DIR, "order_items_dataset.csv")
+order_payments_path = os.path.join(BASE_DIR, "order_payments_dataset.csv")
+
+# 🔹 Fungsi untuk membaca CSV langsung dari direktori proyek
+def load_csv(file_path, label):
+    if os.path.exists(file_path):  # Cek apakah file ada di direktori
+        return pd.read_csv(file_path)
     else:
-        st.warning(f"⚠️ File {file_name} tidak ditemukan. Silakan unggah file CSV.")
-        uploaded_file = st.file_uploader(f"📂 Unggah {label}", type=["csv"])
-        if uploaded_file is not None:
-            return pd.read_csv(uploaded_file)
-        return None
+        st.error(f"❌ File {label} tidak ditemukan di direktori proyek.")
+        st.stop()
 
-# 🔹 Load dataset
-order_items_df = load_csv("order_items_dataset.csv", "Order Items Dataset")
-order_payments_df = load_csv("order_payments_dataset.csv", "Order Payments Dataset")
-
-# 🔹 Pastikan file berhasil di-load
-if order_items_df is None or order_payments_df is None:
-    st.error("❌ Mohon unggah file yang diperlukan untuk melanjutkan.")
-    st.stop()
+# 🔹 Load dataset tanpa unggah manual
+order_items_df = load_csv(order_items_path, "Order Items Dataset")
+order_payments_df = load_csv(order_payments_path, "Order Payments Dataset")
 
 # 🔹 Cek apakah 'order_id' ada di kedua dataset
 if 'order_id' not in order_items_df.columns or 'order_id' not in order_payments_df.columns:
@@ -97,6 +94,3 @@ if not installment_price.empty:
     st.pyplot(fig)
 
 st.caption("📌 Copyright © 2024")
-
-
-
