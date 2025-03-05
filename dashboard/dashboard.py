@@ -7,29 +7,43 @@ import seaborn as sns
 # Atur gaya Seaborn
 sns.set_theme(style="whitegrid", context="talk")
 
-# Path ke direktori proyek
+# 🔹 Tentukan direktori dataset
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-order_items_path = os.path.join(BASE_DIR, "order_items_dataset.csv")
-order_payments_path = os.path.join(BASE_DIR, "order_payments_dataset.csv")
+data_folder = os.path.join(BASE_DIR, "data")  # Folder penyimpanan dataset
+dataset_path = os.path.join(BASE_DIR, "dataset_baru.csv")
 
-# 🔹 Fungsi untuk membaca CSV langsung dari direktori proyek
-def load_csv(file_path, label):
-    if os.path.exists(file_path):  # Cek apakah file ada di direktori
-        return pd.read_csv(file_path)
-    else:
-        st.error(f"❌ File {label} tidak ditemukan di direktori proyek.")
-        st.stop()
+# 🔹 Path untuk masing-masing dataset
+order_items_path = os.path.join(data_folder, "order_items_dataset.csv")
+order_payments_path = os.path.join(data_folder, "order_payments_dataset.csv")
 
-# 🔹 Load dataset tanpa unggah manual
-order_items_df = load_csv(order_items_path, "Order Items Dataset")
-order_payments_df = load_csv(order_payments_path, "Order Payments Dataset")
+# 🔹 Fungsi untuk memuat dataset
+@st.cache_data
+def load_data(file_path, dataset_name):
+    if not os.path.exists(file_path):
+        st.error(f"❌ File {dataset_name} tidak ditemukan: {file_path}")
+        return None
+    try:
+        df = pd.read_csv(file_path, encoding="utf-8")
+        st.success(f"✅ {dataset_name} berhasil dimuat ({len(df)} baris).")
+        return df
+    except Exception as e:
+        st.error(f"⚠️ Gagal membaca {dataset_name}: {e}")
+        return None
 
-# 🔹 Cek apakah 'order_id' ada di kedua dataset
+# 🔹 Muat dataset utama
+order_items_df = load_data(order_items_path, "Order Items Dataset")
+order_payments_df = load_data(order_payments_path, "Order Payments Dataset")
+
+# 🔹 Hentikan jika dataset tidak bisa dimuat
+if order_items_df is None or order_payments_df is None:
+    st.stop()
+
+# 🔹 Pastikan 'order_id' ada di kedua dataset sebelum merge
 if 'order_id' not in order_items_df.columns or 'order_id' not in order_payments_df.columns:
     st.error("❌ Kolom 'order_id' tidak ditemukan di salah satu dataset.")
     st.stop()
 
-# 🔹 Merge datasets berdasarkan 'order_id'
+# 🔹 Gabungkan dataset berdasarkan 'order_id'
 merged_df = order_items_df.merge(order_payments_df, on="order_id", how="inner")
 
 # 🔹 Pastikan 'shipping_limit_date' ada & ubah ke datetime
@@ -94,3 +108,4 @@ if not installment_price.empty:
     st.pyplot(fig)
 
 st.caption("📌 Copyright © 2024")
+
