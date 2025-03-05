@@ -7,10 +7,6 @@ import seaborn as sns
 # Atur gaya Seaborn
 sns.set_theme(style="whitegrid", context="talk")
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-data_path_items = os.path.join(BASE_DIR, "order_items_dataset.csv")
-data_path_payments = os.path.join(BASE_DIR, "order_payments_dataset.csv")
-
 # 🔹 Fungsi untuk membaca file CSV dengan fallback ke file_uploader
 def load_csv(file_name, label):
     if os.path.exists(file_name):  # Cek apakah file ada di direktori yang sama
